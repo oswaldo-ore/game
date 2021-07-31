@@ -22,19 +22,31 @@ import java.util.Iterator;
 /*public class MyGame extends ApplicationAdapter {
 	SpriteBatch batch;
 	Texture img;
+	Float x;
+	Float variable;
 	
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
 		img = new Texture("caraenojada.png" );
+		x = 0.0f;
+		variable = 5f;
 	}
 
 	@Override
 	public void render () {
 		ScreenUtils.clear(1,1,0, 0);
 		batch.begin();
-		batch.draw(img, 0, 0,100,100);
+		batch.draw(img, x, 0,100,100);
 		batch.end();
+
+		x+=variable;
+		if(x + 100 > 800){
+			variable *=-1;
+		}
+		if(x < 0){
+			variable*=-1;
+		}
 	}
 	
 	@Override
@@ -171,3 +183,4 @@ public class MyGame extends Game
 		super.dispose();
 	}
 }
+
