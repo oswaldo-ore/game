@@ -1,21 +1,30 @@
 package com.mygdx.game;
 
+import actors.ActorAbstract;
+import actors.Ball;
+import actors.Ladrillo;
+import actors.Player;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
+import org.w3c.dom.Text;
 
 import java.util.Iterator;
 
@@ -161,25 +170,66 @@ import java.util.Iterator;
 public class MyGame extends Game
 {
 	public SpriteBatch batch;
-	public BitmapFont font;
+	public Stage stage;
+	public Ball ball;
+	public Ladrillo pared;
+	public Ladrillo pared2;
+	public Player player;
 
 
 	@Override
 	public void create() {
 		batch = new SpriteBatch();
-		font = new BitmapFont();
-		this.setScreen(new MainMenuScreen(this));
+		stage = new Stage();
+		ball = new Ball("game/ball-green.png");
+		pared = new Ladrillo("game/ladrillo.png", 100,110);
+		pared2 = new Ladrillo("game/ladrillo.png",230,100);
+		Ladrillo pared3 = new Ladrillo("game/ladrillo.png",300,200);
+		Ladrillo pared4 = new Ladrillo("game/ladrillo.png",500,100);
+		Ladrillo pared5 = new Ladrillo("game/ladrillo.png",400,150);
+		//player = new Player("game/game_base.png");
+		stage.act();
+		stage.setDebugAll(true);
+		stage.addActor(ball);
+		stage.addActor(pared);
+		//stage.addActor(player);
+		stage.addActor(pared2);
+		stage.addActor(pared3);
+		stage.addActor(pared4);
+		stage.addActor(pared5);
+		//this.setScreen(new MainMenuScreen(this));
 	}
+
+
 
 	@Override
 	public void render() {
+		ScreenUtils.clear(.5f,.5f,.5f, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+		stage.act();
+		verificarColiciones();
+		stage.draw();
 		super.render();
+	}
+
+	public void verificarColiciones(){
+		for (int i = 1; i< stage.getActors().size;i++){
+			ActorAbstract actorsito =  (ActorAbstract) stage.getActors().get(i);
+			if(ball.getcircle().overlaps(actorsito.rectangle)) {
+				ball.changeDirection(pared.getRecLadrillo());
+				stage.getActors().removeIndex(i);
+				break;
+			}
+		}
 	}
 
 	@Override
 	public void dispose() {
 		batch.dispose();
-		font.dispose();
+		stage.dispose();
+		pared.dispose();
+		ball.dispose();
+		player.dispose();
 		super.dispose();
 	}
 }

@@ -24,11 +24,6 @@ public class MainMenuScreen implements Screen {
         ScreenUtils.clear(0,0,0.2f,1);
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
-        game.batch.begin();
-        game.font.draw(game.batch,"Bienvenido a gota!!!", 100,150);
-        game.font.draw(game.batch, "click para comenzar", 100,100);
-        game.batch.end();
-
         if(Gdx.input.isTouched())
         {
             game.setScreen(new GameScreen(game));
