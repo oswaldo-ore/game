@@ -1,0 +1,28 @@
+1
+inicio1
+xxxxxxxxxx
+xxxxxxxxxx
+xxxxxxxxxx
+xxxxxxxxxx
+fin1
+2
+inicio2
+xxx xx xxx
+xxxxxxxxxx
+xx  xx x x
+fin2
+3
+inicio3
+xx  xx  xx
+xx  xx  xx
+xx  xx  xx
+xx  xx  xx
+fin3
+4
+inicio4
+xxxxxxxxxx
+x		 x
+x	xx	 x
+x		 x
+xxxxxxxxxx
+fin4

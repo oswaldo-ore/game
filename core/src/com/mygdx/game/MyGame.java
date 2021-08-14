@@ -1,23 +1,22 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.ApplicationAdapter;
+import actores.Ball;
+import actores.Ladrillos;
+import actores.Player;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.TimeUtils;
+import controller.BallLadrillosController;
+import controller.PlayerController;
+import utils.Constantes;
+import utils.LeerFichero;
+import utils.SingletonSound;
 
-import java.util.Iterator;
+import java.io.IOException;
 
 /*public class MyGame extends ApplicationAdapter {
 	SpriteBatch batch;
@@ -160,26 +159,78 @@ import java.util.Iterator;
 
 public class MyGame extends Game
 {
-	public SpriteBatch batch;
-	public BitmapFont font;
+	SpriteBatch batch;
+	Ball ball;
+	Stage escenario;
+	Player player;
+	PlayerController playerController;
+	BallLadrillosController ballLadrillosController;
+	SingletonSound sound;
 
 
 	@Override
 	public void create() {
+		sound = new SingletonSound();
 		batch = new SpriteBatch();
-		font = new BitmapFont();
-		this.setScreen(new MainMenuScreen(this));
+		escenario = new Stage();
+		ball = new Ball("game/ball-green.png");
+		player = new Player("game/player.png");
+		escenario.addActor(ball);
+		escenario.addActor(player);
+		playerController = new PlayerController(player);
+		Gdx.input.setInputProcessor(playerController);
+		ballLadrillosController = new BallLadrillosController(ball);
+		sound.playMusic();
 	}
 
+
+
 	@Override
-	public void render() {
+	public void render(){
+		ScreenUtils.clear(0.5f,0.5f,0.5f,1);
+		interceptar();
+		batch.begin();
+		ballLadrillosController.update(batch, Gdx.graphics.getDeltaTime());
+		escenario.act();
+		escenario.draw();
+		batch.end();
 		super.render();
 	}
+
+	public void interceptar(){
+		Rectangle aa = new Rectangle();
+		if(Intersector.intersectRectangles(ball.imageRec,player.imageRec,aa)){
+
+			if(aa.width <= ball.getWidth()/2 && aa.getHeight() <= 5.0f
+				|| aa.getHeight() < ball.getHeight() / 2 && aa.getWidth()<=5
+			){
+				ball.extremo();
+			}
+			if(aa.height<= 7 && aa.width >= ball.getWidth()/ 2 ) {
+				ball.changeTopButton();
+			}
+			if(aa.height >= ball.getHeight() && aa.width <= 7) {
+				ball.changeLeftRigth();
+			}
+			System.out.println("interception ball in player desde intersector" );
+			System.out.println(aa.toString());
+		}
+		if(ball.getY() < Constantes.SPACE_BUTTOM){
+			sound.stopMusic();
+			sound.soundDie();
+		}
+	}
+
+
 
 	@Override
 	public void dispose() {
 		batch.dispose();
-		font.dispose();
+		ball.dispose();
+		escenario.dispose();
+		player.dispose();
+		ballLadrillosController.dispose();
+		sound.dispose();
 		super.dispose();
 	}
 }
