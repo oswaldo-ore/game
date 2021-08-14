@@ -177,6 +177,7 @@ public class MyGame extends Game
 		player = new Player("game/player.png");
 		escenario.addActor(ball);
 		escenario.addActor(player);
+		player.iniciar(3);
 		playerController = new PlayerController(player);
 		Gdx.input.setInputProcessor(playerController);
 		ballLadrillosController = new BallLadrillosController(ball);
@@ -215,9 +216,10 @@ public class MyGame extends Game
 			System.out.println("interception ball in player desde intersector" );
 			System.out.println(aa.toString());
 		}
-		if(ball.getY() < Constantes.SPACE_BUTTOM){
+		if(player.isAlive() && ball.getY() < Constantes.SPACE_BUTTOM){
 			sound.stopMusic();
 			sound.soundDie();
+			player.die();
 		}
 	}
 
