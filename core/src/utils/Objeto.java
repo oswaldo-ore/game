@@ -9,6 +9,15 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 public class Objeto extends Actor {
     public Texture image;
     public Rectangle imageRec;
+    private Boolean finalizo;
+
+    public Boolean getFinalizo() {
+        return finalizo;
+    }
+
+    public void setFinalizo(Boolean finalizo) {
+        this.finalizo = finalizo;
+    }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {

@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import resource.SingletonLoadResouce;
+import utils.Constantes;
 import utils.Objeto;
 
 public class Explosion extends Objeto {
@@ -13,13 +15,12 @@ public class Explosion extends Objeto {
     private TextureRegion[] regionMovimiento;
     private Texture imagen;
     private TextureRegion frameActual;
-    private float imageWidth,imageHeigth;
 
 
 
     public Explosion(float x,float y){
-
-        imagen = new Texture(Gdx.files.internal("game/sprite_explosion.png"));
+        SingletonLoadResouce resource= SingletonLoadResouce.getSingletonLoadResouce();
+        imagen = resource.getAssetManager().get("game/sprite_explosion.png");
         TextureRegion[][] tmp = TextureRegion.split(imagen, imagen.getWidth()/5, imagen.getHeight()/5);
         regionMovimiento = new TextureRegion[25];
         int k=0;
@@ -29,18 +30,20 @@ public class Explosion extends Objeto {
                 k+=1;
             }
         }
-        animation = new Animation(1/10f,regionMovimiento);
+        animation = new Animation(1/20f,regionMovimiento);
         time=0f;
-        imageWidth = (imagen.getWidth()/5)/2;
-        imageHeigth = (imagen.getHeight()/5)/2;
-        setPosition(x-imageWidth,y-imageHeigth);
+        setPosition(x-Constantes.LADRILLO_WIDTH/2,y-Constantes.LADRILLO_HEIGHT/2);
+        setFinalizo(false);
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         time+= Gdx.graphics.getDeltaTime();
         frameActual = (TextureRegion) animation.getKeyFrame(time,false);
-        batch.draw(frameActual,getX(),getY() );
+        if(animation.isAnimationFinished(time)){
+            setFinalizo(true);
+        }
+        batch.draw(frameActual,getX(),getY(), Constantes.LADRILLO_WIDTH * 2,Constantes.LADRILLO_HEIGHT*2);
         super.draw(batch, parentAlpha);
     }
 

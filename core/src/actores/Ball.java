@@ -4,21 +4,34 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Rectangle;
+import resource.SingletonLoadResouce;
 import utils.Constantes;
 import utils.Objeto;
 
 public class Ball extends Objeto {
-    private float speedX = 5f;
-    private float speedY = 5f;
+    private float speedX;
+    private float speedY;
+    private boolean moving = false;
+
     public Ball(String srcImage){
-        image = new Texture(Gdx.files.internal(srcImage));
-        setBounds( Constantes.CENTER_X - Constantes.RADIO_BALL / 2,Constantes.SPACE_BUTTOM + Constantes.PLAYER_HEIGHT,
-                Constantes.RADIO_BALL,Constantes.RADIO_BALL);
+        SingletonLoadResouce resouce = SingletonLoadResouce.getSingletonLoadResouce();
+        image = resouce.getAssetManager().get(srcImage);
+        posInicio();
+        restartSpeed();
         imageRec = new Rectangle();
         imageRec.setPosition(getX(),getY());
         imageRec.setSize(getWidth(),getHeight());
     }
 
+    private void restartSpeed(){
+        speedX = 2.5f;
+        speedY = 2.5f;
+    }
+
+    public void speedUp(){
+        speedX+= 0.5f;
+        speedY+= 0.5f;
+    }
 
 
     public Ball(String srcImage,float x,float y){
@@ -28,6 +41,20 @@ public class Ball extends Objeto {
         imageRec = new Rectangle();
         setPosition(getX(),getY());
         setSize(getWidth(),getHeight());
+    }
+
+    private void posInicio(){
+        setBounds( Constantes.CENTER_X - Constantes.RADIO_BALL / 2,Constantes.SPACE_BUTTOM + Constantes.PLAYER_HEIGHT,
+                Constantes.RADIO_BALL,Constantes.RADIO_BALL);
+    }
+
+    public void iniciar(){
+        moving = true;
+    }
+    public void detener(){
+        moving = false;
+        restartSpeed();
+        posInicio();
     }
     public void changeTopButton(){
         speedY*=-1;
@@ -44,9 +71,11 @@ public class Ball extends Objeto {
 
     @Override
     public void act(float delta) {
-        setPosition(getX()+speedX,getY()+speedY);
-        imageRec.setPosition(getX(),getY());
-        rebotePared();
+        if(moving){
+            setPosition(getX()+ speedX ,getY()+ speedY);
+            imageRec.setPosition(getX(),getY());
+            rebotePared();
+        }
         super.act(delta);
     }
 
@@ -58,6 +87,11 @@ public class Ball extends Objeto {
             speedY*=-1;
         }
     }
+
+    public boolean isMoving() {
+        return moving;
+    }
+
 
     @Override
     public void draw(Batch batch, float parentAlpha) {

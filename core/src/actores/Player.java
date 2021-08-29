@@ -4,33 +4,43 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Rectangle;
+import resource.SingletonLoadResouce;
 import utils.Constantes;
 import utils.Objeto;
 
 public class Player extends Objeto {
     public float SPEEDX = 3;
-    public float MoveX = 0;
+    private float MoveX = 0;
     public boolean mover = false;
     private boolean isAlive = false;
+    private boolean moving = false;
     private int life = 0;
 
     public Player (String srcImage){
-        image = new Texture(Gdx.files.internal(srcImage));
-        setBounds(Constantes.CENTER_X - Constantes.PLAYER_WIDTH/2,
-                Constantes.SPACE_BUTTOM,Constantes.PLAYER_WIDTH,Constantes.PLAYER_HEIGHT);
+        SingletonLoadResouce resouce = SingletonLoadResouce.getSingletonLoadResouce();
+        image = resouce.getAssetManager().get(srcImage);
+        posInicio();
         imageRec = new Rectangle();
         imageRec.setPosition(getX(),getY());
         imageRec.setSize(getWidth(),getHeight());
     }
 
+    public void posInicio(){
+        setBounds(Constantes.CENTER_X - Constantes.PLAYER_WIDTH/2,
+                Constantes.SPACE_BUTTOM,Constantes.PLAYER_WIDTH,Constantes.PLAYER_HEIGHT);
+        MoveX =0;
+    }
+
     @Override
     public void act(float delta) {
-        mover();
+        if(moving && isAlive){
+            mover();
+        }
     }
 
     private void mover(){
         if(mover){
-            if(MoveX > getRight() && MoveX < Constantes.WIDTH){
+            if(MoveX > getRight() && MoveX <= Constantes.WIDTH){
                 moverDerecha();
                 if(getX()+ getWidth()/2 > MoveX) mover = false;
             }
@@ -39,15 +49,12 @@ public class Player extends Objeto {
                 if(getX()<0 || MoveX < 0) mover = false;
             }
         }
-
     }
 
     public void moverIzquierda(){
-
         setX(getX() - SPEEDX );
         imageRec.setX(getX());
     }
-
     public void moverDerecha(){
         setX(getX() + SPEEDX);
         imageRec.setX(getX());
@@ -65,8 +72,9 @@ public class Player extends Objeto {
     }
 
     public boolean isAlive() {
-        return isAlive ;
+        return life > 0;
     }
+
 
     public void setAlive(boolean alive) {
         isAlive = alive;
@@ -80,6 +88,13 @@ public class Player extends Objeto {
         this.life = life;
         this.isAlive = true;
     }
+    public void initMoving(){
+        this.moving = true;
+    }
+
+    public void stopMoving(){
+        this.moving = false;
+    }
 
     public void setLife(int life) {
         this.life = life;
@@ -87,11 +102,21 @@ public class Player extends Objeto {
 
     public void die(){
         this.life -=1;
+        stopMoving();
         if(this.life <=0){
             this.isAlive = false;
         }
+
+        posInicio();
     }
-    public void gainLife(){
-        this.life += 1;
+
+    public boolean isMoving(){
+        return moving;
     }
+    public void gainLife(){this.life += 1; }
+    public void loseLife(){this.life-=1;}
+
+
+
+
 }

@@ -1,51 +1,75 @@
 package controller;
 
-import actores.Ball;
-import actores.Explosion;
-import actores.Ladrillo;
-import actores.Ladrillos;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import actores.*;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
+import utils.Constantes;
 import utils.Objeto;
-import utils.SingletonSound;
+import utils.SoundGame;
 
 public class BallLadrillosController {
     Ball ball;
     Ladrillos paredes;
-    SingletonSound sound = new SingletonSound();
+    Player player;
+    SoundGame sound ;
 
-    public BallLadrillosController(Ball ball){
+    public BallLadrillosController(Ball ball, Ladrillos ladrillos, Player player, SoundGame sound){
         this.ball = ball;
-        paredes = new Ladrillos();
+        this.paredes = ladrillos;
+        this.player = player;
+        this.sound = sound;
+
     }
 
-    public void update(SpriteBatch batch, float delta){
-        checkColiciones(delta);
-        paredes.draw(batch);
+
+    public void update(float delta){
+        interceptar();
+        checkColiciones();
     }
 
-    private void checkColiciones(float delta) {
-        for (int i = 0; i < paredes.ladrillos.size; i++) {
-            if(paredes.getLadrillos(i).imageRec != null ){
-                if(Intersector.intersectRectangles(ball.imageRec,paredes.getLadrillos(i).imageRec,new Rectangle())){
+    private void checkColiciones() {
+        for (int i = 0; i < paredes.wall.size; i++) {
+                if(Intersector.intersectRectangles(ball.imageRec,paredes.getLadrillos(i).imageRec,new Rectangle())) {
                     sound.soundExplotion();
                     ball.changeTopButton();
                     Objeto ladrillo = paredes.getLadrillos(i);
-                    Explosion explosion = new Explosion(ladrillo.getX(),ladrillo.getY());
                     paredes.deleteLadrillo(i);
-                    paredes.insertarSprite(i,explosion);
-                    i = paredes.ladrillos.size + 1;
+                    i = paredes.wall.size + 1;
                 }
-            }
         }
     }
+
+    public void interceptar(){
+        Rectangle aa = new Rectangle();
+        if(Intersector.intersectRectangles(ball.imageRec,player.imageRec,aa)){
+
+            if(aa.width <= ball.getWidth()/2 && aa.getHeight() <= 5.0f
+                    || aa.getHeight() < ball.getHeight() / 2 && aa.getWidth()<=5
+            ){
+                ball.extremo();
+            }
+            if(aa.height<= 7 && aa.width >= ball.getWidth()/ 2 ) {
+                ball.changeTopButton();
+            }
+            if(aa.height >= ball.getHeight() && aa.width <= 7) {
+                ball.changeLeftRigth();
+            }
+        }
+        die();
+    }
+
+    public void die(){
+        if(player.isAlive() && ball.getY() < Constantes.SPACE_BUTTOM){
+            sound.stopMusic();
+            player.die();
+            ball.detener();
+            sound.soundDie();
+            paredes.cargarDatos();
+        }
+    }
+
 
     public void dispose(){
         paredes.dispose();
     }
-
-
-
-
 }

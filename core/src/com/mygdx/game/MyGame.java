@@ -1,22 +1,16 @@
 package com.mygdx.game;
 
-import actores.Ball;
-import actores.Ladrillos;
-import actores.Player;
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.ScreenUtils;
-import controller.BallLadrillosController;
-import controller.PlayerController;
-import utils.Constantes;
-import utils.LeerFichero;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
+import resource.LoadResource;
+import resource.SingletonLoadResouce;
+import utils.BaseScreen;
 import utils.SingletonSound;
-
-import java.io.IOException;
+import view.GameOver;
+import view.GameScreen;
+import view.LoadingScreen;
 
 /*public class MyGame extends ApplicationAdapter {
 	SpriteBatch batch;
@@ -157,12 +151,13 @@ import java.io.IOException;
 	}
 }*/
 
-public class MyGame extends Game
+/*public class MyGame extends Game
 {
 	SpriteBatch batch;
 	Ball ball;
 	Stage escenario;
 	Player player;
+	Ladrillos paredes;
 	PlayerController playerController;
 	BallLadrillosController ballLadrillosController;
 	SingletonSound sound;
@@ -173,14 +168,15 @@ public class MyGame extends Game
 		sound = new SingletonSound();
 		batch = new SpriteBatch();
 		escenario = new Stage();
+		paredes  =new Ladrillos();
 		ball = new Ball("game/ball-green.png");
 		player = new Player("game/player.png");
 		escenario.addActor(ball);
 		escenario.addActor(player);
+		escenario.addActor(paredes);
 		player.iniciar(3);
-		playerController = new PlayerController(player);
-		Gdx.input.setInputProcessor(playerController);
-		ballLadrillosController = new BallLadrillosController(ball);
+		playerController = new PlayerController(player,ball);
+		ballLadrillosController = new BallLadrillosController(ball,paredes,player );
 		sound.playMusic();
 	}
 
@@ -189,39 +185,14 @@ public class MyGame extends Game
 	@Override
 	public void render(){
 		ScreenUtils.clear(0.5f,0.5f,0.5f,1);
-		interceptar();
+		ballLadrillosController.update(Gdx.graphics.getDeltaTime());
 		batch.begin();
-		ballLadrillosController.update(batch, Gdx.graphics.getDeltaTime());
 		escenario.act();
 		escenario.draw();
 		batch.end();
 		super.render();
 	}
 
-	public void interceptar(){
-		Rectangle aa = new Rectangle();
-		if(Intersector.intersectRectangles(ball.imageRec,player.imageRec,aa)){
-
-			if(aa.width <= ball.getWidth()/2 && aa.getHeight() <= 5.0f
-				|| aa.getHeight() < ball.getHeight() / 2 && aa.getWidth()<=5
-			){
-				ball.extremo();
-			}
-			if(aa.height<= 7 && aa.width >= ball.getWidth()/ 2 ) {
-				ball.changeTopButton();
-			}
-			if(aa.height >= ball.getHeight() && aa.width <= 7) {
-				ball.changeLeftRigth();
-			}
-			System.out.println("interception ball in player desde intersector" );
-			System.out.println(aa.toString());
-		}
-		if(player.isAlive() && ball.getY() < Constantes.SPACE_BUTTOM){
-			sound.stopMusic();
-			sound.soundDie();
-			player.die();
-		}
-	}
 
 
 
@@ -231,8 +202,39 @@ public class MyGame extends Game
 		ball.dispose();
 		escenario.dispose();
 		player.dispose();
-		ballLadrillosController.dispose();
+		paredes.dispose();
 		sound.dispose();
+		super.dispose();
+	}
+}*/
+
+public class MyGame extends Game{
+	private SingletonLoadResouce resource;
+	public BaseScreen loadingScreen,menuScreen,gameScreen,gameOverScreen;
+	@Override
+	public void create() {
+		resource =  SingletonLoadResouce.getSingletonLoadResouce();
+		resource.cargar();
+		loadingScreen = new LoadingScreen(this);
+		setScreen(loadingScreen);
+	}
+
+	public void finishLoading(){
+		menuScreen = new view.MenuScreen(this);
+		gameScreen = new GameScreen(this);
+		gameOverScreen = new GameOver(this);
+		SingletonSound.getSingletonSound();
+		setScreen(menuScreen);
+	}
+
+
+	public AssetManager getManager(){
+		return resource.getAssetManager();
+	}
+
+	@Override
+	public void dispose() {
+		resource.dispose();
 		super.dispose();
 	}
 }
